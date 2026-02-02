@@ -1,0 +1,90 @@
+class Solution:
+    def maximalRectangle(self, matrix: List[List[str]]) -> int:
+        
+        # Number of rows
+        n = len(matrix)
+        
+        # Number of columns
+        m = len(matrix[0])
+        
+        # Prefix matrix to store heights of consecutive 1s
+        preMatrix = []
+        
+        # Initialize prefix matrix with zeros
+        for i in range(0, n):
+            lst = [0] * m
+            preMatrix.append(lst)
+        
+        # Fill first row of prefix matrix
+        for j in range(0, m):
+            preMatrix[0][j] = int(matrix[0][j])
+        
+        # Build prefix heights for remaining rows
+        for i in range(1, n):
+            for j in range(0, m):
+                if matrix[i][j] == '1':
+                    preMatrix[i][j] = preMatrix[i - 1][j] + int(matrix[i][j])
+        
+        # Variable to store current area
+        area = 0
+        
+        # Variable to store maximum area
+        maxArea = 0
+        
+        # Process each row as histogram
+        for heights in preMatrix:
+            
+            # Function to find next smaller element indices
+            def find_nse(heights):
+                n = len(heights)
+                stack = []
+                ans = [0] * n
+                
+                # Traverse from right to left
+                for i in range(n - 1, -1, -1):
+                    while len(stack) != 0 and heights[stack[-1]] >= heights[i]:
+                        stack.pop()
+                    
+                    # If no smaller element to the right
+                    if len(stack) == 0:
+                        ans[i] = len(heights)
+                    else:
+                        ans[i] = stack[-1]
+                    
+                    stack.append(i)
+                
+                return ans
+            
+            # Function to find previous smaller element indices
+            def find_pse(heights):
+                n = len(heights)
+                stack = []
+                ans = [0] * n
+                
+                # Traverse from left to right
+                for i in range(0, n):
+                    while len(stack) != 0 and heights[stack[-1]] >= heights[i]:
+                        stack.pop()
+                    
+                    # If no smaller element to the left
+                    if len(stack) == 0:
+                        ans[i] = -1
+                    else:
+                        ans[i] = stack[-1]
+                    
+                    stack.append(i)
+                
+                return ans
+            
+            # Get next smaller elements
+            nse = find_nse(heights)
+            
+            # Get previous smaller elements
+            pse = find_pse(heights)
+            
+            # Calculate max area for current histogram
+            for i in range(0, len(heights)):
+                area = heights[i] * (nse[i] - pse[i] - 1)
+                maxArea = max(area, maxArea)
+        
+        return maxArea
