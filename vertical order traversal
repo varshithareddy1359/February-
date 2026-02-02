@@ -1,0 +1,53 @@
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+
+from collections import defaultdict, deque
+
+class Solution:
+    def verticalTraversal(self, root: Optional[TreeNode]) -> List[List[int]]:
+        
+        # Queue for BFS storing (node, vertical, level)
+        q = deque([(root, 0, 0)])
+        
+        # Dictionary: {vertical : {level : [node values]}}
+        d = defaultdict(lambda: defaultdict(list))
+        
+        # BFS traversal
+        while len(q) > 0:
+            
+            # Pop current node with its vertical and level
+            node, vertical, level = q.popleft()
+            
+            # Add node value to corresponding vertical and level
+            d[vertical][level].append(node.val)
+            
+            # If left child exists, push with vertical-1 and level+1
+            if node.left:
+                q.append((node.left, vertical - 1, level + 1))
+            
+            # If right child exists, push with vertical+1 and level+1
+            if node.right:
+                q.append((node.right, vertical + 1, level + 1))
+        
+        # Final answer list
+        ans = []
+        
+        # Sort by vertical order
+        for i in sorted(d):
+            
+            col = []
+            
+            # Sort by level within the same vertical
+            for j in sorted(d[i]):
+                
+                # Sort values when multiple nodes share same position
+                col.extend(sorted(d[i][j]))
+            
+            # Append column to answer
+            ans.append(col)
+        
+        return ans
