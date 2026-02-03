@@ -1,0 +1,9 @@
+class Solution:
+    def canJump(self, nums: List[int]) -> bool:
+        maxIndex = 0 
+        for ind in range(0,len(nums)):
+            if(ind>maxIndex):
+                return False
+            maxIndex = max(maxIndex,ind+nums[ind])
+        return True         
+        
